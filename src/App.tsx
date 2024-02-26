@@ -52,7 +52,7 @@ function App() {
                 className="button__size button__transparent header__claim"
               >
                 <div>
-                  BUY TOKENS
+                  Buy Tokens
                 </div> 
               </a>
               {account? <div className="button__size button__transparent">
@@ -62,7 +62,7 @@ function App() {
                           </div>
                         </div> :
                         <div style={{cursor: "pointer"}}  onClick={() => activateBrowserWallet()} className="button__size button__style">
-                          <div>CONNECT WALLET</div> 
+                          <div>Connect Wallet</div> 
                         </div>
               }
             </div>
