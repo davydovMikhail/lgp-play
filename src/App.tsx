@@ -1,27 +1,55 @@
+import { useEffect } from 'react'
 import Logo from "./img/logo.svg";
 import Person from "./img/person.svg";
 import Info from './components/info';
 import Segment from './components/segment';
 import Table from './components/table';
 import Tabs from './components/tabs';
-import Pagination from './components/pagination';
 import Footer from './components/footer';
-import { useEthers } from "@usedapp/core";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import { useTypedSelector } from './storeHooks/useTypedSelector';
-import { Status } from './types/main';
-import { useActions } from './storeHooks/useActions';
+import { useActions } from "./storeHooks/useActions";
+declare const window: any;
 
 function App() {
-  const { status, advanced } = useTypedSelector(state => state.main);
-  const { SetAdvanced } = useActions();
-  const { activateBrowserWallet, account } = useEthers();
-  
-  const advancedHandler = () => {
-    SetAdvanced(!advanced)
-  }
+  const { address } = useTypedSelector(state => state.main);
+  const { SetAddress } = useActions();
 
+
+  const getProvider = () => {
+    if ('phantom' in window) {
+      const provider: any = window.phantom?.solana;
+  
+      if (provider?.isPhantom) {
+        return provider;
+      }
+    }
+    window.open('https://phantom.app/', '_blank');
+  };
+
+  let provider = getProvider();
+
+  useEffect(() => {
+    if(provider) {
+        provider.on("connect", () => {
+          SetAddress(provider.publicKey.toString());
+        });
+        provider.on("disconnect", () => {
+          SetAddress(null);
+        });
+    }
+  }, [provider]);
+
+  async function activateBrowserWallet() {
+    try {
+        await provider.connect();
+    } catch (err) {
+        window.open('https://phantom.app/', '_blank');
+        console.log(err);
+    }
+  }
+  
   return (
     <>
       <main>
@@ -29,64 +57,45 @@ function App() {
           <div className="header">
             <div className="header__left">
               <img src={Logo} className="header__logo" />
-              {/* <div className="switcher">
-                <div className="toggle-pill-dark">
-                  <input 
-                    type="checkbox" 
-                    id="pill4"
-                    name="check"
-                    checked={advanced}
-                    onChange={advancedHandler}
-                    disabled={status === Status.Loader}
-                  />
-                  <label htmlFor="pill4"></label>
-                </div>
-                <div className="switcher__title">
-                  advanced mode
-                </div>
-              </div> */}
             </div>
             <div className="header__right">
               <a 
-                target="_blank" href="https://app.uniswap.org/swap"
+                target="_blank" href="https://raydium.io/swap/?inputCurrency=sol"
                 className="button__size button__transparent header__claim"
               >
                 <div>
                   Buy Tokens
                 </div> 
               </a>
-              {account? <div className="button__size button__transparent">
-                          <img style={{marginRight: "10px"}} src={Person} alt="Person" />
-                          <div>
-                          {account?.slice(0, 5)}...{account?.slice(-2)}
-                          </div>
-                        </div> :
-                        <div style={{cursor: "pointer"}}  onClick={() => activateBrowserWallet()} className="button__size button__style">
-                          <div>Connect Wallet</div> 
-                        </div>
+              {address ? 
+                <div className="button__size button__transparent">
+                  <img style={{marginRight: "10px"}} src={Person} alt="Person" />
+                  <div>
+                  {address?.slice(0, 5)}...{address?.slice(-2)}
+                  </div>
+                </div> 
+                :
+                <div style={{cursor: "pointer"}}  onClick={() => activateBrowserWallet()} className="button__size button__style">
+                  <div>Connect Wallet</div> 
+                </div>
               }
             </div>
           </div>
         </div>
-
         <div className="bg-wrapper">
           <div className="base">
             <Info />
-              <Segment/>  
+            <Segment/>  
           </div>
         </div>
         <div className="table-wrapper">
-            <Tabs />
-            <Table />
-            <div className="pagination-wrapper">
-              <Pagination />
-            </div>
+          <Tabs />
+          <Table />
         </div>
         <Footer />
       </main>
       <ToastContainer/>
     </>
-    
   );
 }
 
