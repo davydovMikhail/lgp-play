@@ -26,7 +26,7 @@ const Info = () => {
     }
 
     function maxPayout() {
-        return "10500000"
+        return "60,000,000"
     }
 
     function balance() {

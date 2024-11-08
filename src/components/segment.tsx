@@ -149,7 +149,7 @@ const Segment = () => {
         });
         return;
       }
-      toast.info('CASINO WILL GO LIVE ON MARCH 29TH 22:00 UTC', {
+      toast.info('YOU NEED $LGP TO PLAY', {
           position: "bottom-center",
           autoClose: 1000,
           hideProgressBar: true,
@@ -157,7 +157,7 @@ const Segment = () => {
           draggable: true,
           theme: "dark",
       });
-      SetNotification('CASINO WILL GO LIVE ON MARCH 29TH 22:00 UTC');
+      SetNotification('YOU NEED $LGP TO PLAY');
     }
     
     return (
